@@ -40,8 +40,8 @@ void print_patch(u64 addr, ucode_t ucode_patch[], int n) {
 
 void init_match_and_patch(void) {
     #include "ucode/match_and_patch_init.h"
-    patch_ucode(addr, ucode_patch, ARRAY_SZ(ucode_patch));
-    u64 ret = ucode_invoke(addr);
+    patch_ucode(addr_init, ucode_patch_init, ARRAY_SZ(ucode_patch_init));
+    u64 ret = ucode_invoke(addr_init);
     /* if (verbose) */
     /*     printf("init_match_and_patch: %lx\n", ret); */
     enable_match_and_patch();
@@ -77,5 +77,6 @@ u64 ldat_array_read(u64 pdat_reg, u64 array_sel, u64 bank_sel, u64 dword_idx, u6
 
 void do_fix_IN_patch() {
     // Patch U58ba to U017a
-    hook_match_and_patch(0x1f, 0x58ba, 0x017a);
+    //hook_match_and_patch(0x1f, 0x58ba, 0x017a);
+    hook_match_and_patch(0x1f, 0x4912, 0x0172);
 }
