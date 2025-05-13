@@ -11,7 +11,7 @@ ucode_t ucode_patch_init[] = {
         MOVETOCREG_DSZ64_RI(TMP0, 0x6a0),
         // write match&patch [0, 0x20]
         //WRMSLOOPCTRFBR_I(0x20),
-        WRMSLOOPCTRFBR_I(0x5),
+        WRMSLOOPCTRFBR_I(0x10),
         NOP_SEQWORD
     },
     {   // 0x7de8

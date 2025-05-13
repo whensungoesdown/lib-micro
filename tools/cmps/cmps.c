@@ -13,7 +13,9 @@
 
 //u8 verbose = 0;
 
-#define JUMP_DESTINATION 0x7c10
+//#define JUMP_DESTINATION 0x7c10
+#define JUMP_DESTINATION 0x7c00
+
 void install_jump_target(void) {
     unsigned long addr = JUMP_DESTINATION;
 
@@ -40,7 +42,7 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
         printf("persistent_trace only supports 4-aligned uaddrs currently. (%04lx)\n", hook_address);
     return;
     }
-    //install_jump_target();
+    install_jump_target();
     u64 uop0 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+0) & CRC_UOP_MASK;
     u64 uop1 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+1) & CRC_UOP_MASK;
     u64 uop2 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+2) & CRC_UOP_MASK;
