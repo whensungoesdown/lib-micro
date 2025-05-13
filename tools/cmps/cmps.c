@@ -26,7 +26,7 @@ void install_jump_target(void) {
 //    { MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP,
 //    { NOP, NOP, NOP,
 //            END_SEQWORD }, //0x7d00
-    {MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP, 0x018000f0} // SEQW UEND0
+    {MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP, END_SEQWORD} // SEQW UEND0
 //        {UNK256, NOP, NOP, END_SEQWORD}, //0x7d04
     };
 //    if (verbose)
@@ -69,36 +69,36 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //NOP,
             //SEQ_GOTO0(addr+0x14)
         },
-//        {   // 0x4
-//            //TESTUSTATE_SYS_NOT(0x2),
-//            //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP0, 0xba40),
-//            //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP1, 0xba80),
-//            //SEQ_GOTO0(addr+0x14)
-//
-////            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x18),  // dst_reg, src_reg, seg
-////            ZEROEXT_DSZ64_DI(TMP1, 0x4142),
-////            //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
-////            XOR_DSZ64_DRR(TMP0, TMP0, TMP1),
+        {   // 0x4
+            //TESTUSTATE_SYS_NOT(0x2),
+            //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP0, 0xba40),
+            //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP1, 0xba80),
+            //SEQ_GOTO0(addr+0x14)
+
+            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x18),  // dst_reg, src_reg, seg
+            ZEROEXT_DSZ64_DI(TMP1, 0x4142),
+            //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
+            XOR_DSZ16_DRR(TMP0, TMP0, TMP1),
 //	    NOP,
 //	    NOP,
 //	    NOP,
-//            NOP_SEQWORD
-//
-//        },
-//        {   // 0x8
-//            //ZEROEXT_DSZ32_DI(TMP0, 0xdead),
-//            //CONCAT_DSZ16_DRR(TMP0, TMP0, TMP0),
-//            //CONCAT_DSZ32_DRR(TMP0, TMP0, TMP0),
-//            //NOP_SEQWORD
-//            
-////	    UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
-//	    //MOVE_DSZ64_DI(RAX, 0xabcd),
-//            NOP,
-//            NOP,
-//            NOP,
-//            NOP_SEQWORD
-//	    //END_SEQWORD
-//        },
+            NOP_SEQWORD
+
+        },
+        {   // 0x8
+            //ZEROEXT_DSZ32_DI(TMP0, 0xdead),
+            //CONCAT_DSZ16_DRR(TMP0, TMP0, TMP0),
+            //CONCAT_DSZ32_DRR(TMP0, TMP0, TMP0),
+            //NOP_SEQWORD
+            
+	    UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
+	    //MOVE_DSZ64_DI(RAX, 0xabcd),
+        //    NOP,
+            NOP,
+            NOP,
+            NOP_SEQWORD
+	    //END_SEQWORD
+        },
 //        {   // 0xc
 //            //XOR_DSZ64_DRR(TMP0, TMP0, RAX),
 //            //MOVE_DSZ64_DI(TMP1, hook_address),
