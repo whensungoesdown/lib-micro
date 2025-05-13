@@ -77,8 +77,8 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
 
             LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x18),  // dst_reg, src_reg, seg
             ZEROEXT_DSZ64_DI(TMP1, 0x4142),
-            //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
-            XOR_DSZ16_DRR(TMP0, TMP0, TMP1),
+            SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
+            //XOR_DSZ64_DRR(TMP0, TMP0, TMP1),
 //	    NOP,
 //	    NOP,
 //	    NOP,
@@ -91,11 +91,13 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //CONCAT_DSZ32_DRR(TMP0, TMP0, TMP0),
             //NOP_SEQWORD
             
+            ADD_DSZ32_DRI(TMP1, TMP1, 0x4142),
+            SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
 	    UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
 	    //MOVE_DSZ64_DI(RAX, 0xabcd),
         //    NOP,
-            NOP,
-            NOP,
+        //    NOP,
+        //    NOP,
             NOP_SEQWORD
 	    //END_SEQWORD
         },
