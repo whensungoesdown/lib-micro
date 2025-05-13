@@ -26,7 +26,8 @@ void install_jump_target(void) {
 //    { MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP,
 //    { NOP, NOP, NOP,
 //            END_SEQWORD }, //0x7d00
-    {MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP, END_SEQWORD} // SEQW UEND0
+    //{MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP, END_SEQWORD} // SEQW UEND0
+    {SUBR_DSZ64_DRR(TMP10, TMP10, TMP10), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
 //        {UNK256, NOP, NOP, END_SEQWORD}, //0x7d04
     };
 //    if (verbose)
@@ -75,7 +76,7 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP1, 0xba80),
             //SEQ_GOTO0(addr+0x14)
 
-            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x18),  // dst_reg, src_reg, seg
+            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x08),  // dst_reg, src_reg, seg
             ZEROEXT_DSZ64_DI(TMP1, 0x4142),
             SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
             //XOR_DSZ64_DRR(TMP0, TMP0, TMP1),
