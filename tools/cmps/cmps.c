@@ -27,6 +27,7 @@ void install_jump_target(void) {
 //    { NOP, NOP, NOP,
 //            END_SEQWORD }, //0x7d00
     //{MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP, END_SEQWORD} // SEQW UEND0
+    {NOP, NOP, XOR_DSZ64_DRR(RCX, RCX, RCX), NOP_SEQWORD},
     {SUBR_DSZ64_DRR(TMP10, TMP10, TMP10), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
 //        {UNK256, NOP, NOP, END_SEQWORD}, //0x7d04
     };
@@ -60,6 +61,9 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //UJMP_I(addr+0x16),
 // 64-bit 0xa79016d797e6bd3d
 // 32-bit 0x97e6bd3d
+            //NOP,
+            //MOVEFROMCREG_DSZ64_DI(TMP10, 0x0),
+            //0x21e3b000200, //SIGEVENT(0x0000003b)
             NOP,
             LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x08),  // dst_reg, src_reg, seg
             //LDZX_DSZ64_ASZ64_SC8_DR(TMP0, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
@@ -266,7 +270,8 @@ int main(int argc, char* argv[]) {
 
 //    usleep(20000);
 
-#define CMPS_XLAT   0x08b0
+//#define CMPS_XLAT   0x08b0
+#define CMPS_XLAT   0x3cc8
 
     hook_cmps(0x7c10, CMPS_XLAT, 1);
 
