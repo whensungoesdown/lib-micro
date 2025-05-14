@@ -58,79 +58,44 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //UJMP_I(addr+0x4),
             //UJMP_I(addr+0x15),
             //UJMP_I(addr+0x16),
-            //NOP_SEQWORD
-
-            UJMP_I(addr+0x4),
-            UJMP_I(addr+0x5),
-            UJMP_I(addr+0x6),
+// 64-bit 0xa79016d797e6bd3d
+// 32-bit 0x97e6bd3d
+            NOP,
+            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x08),  // dst_reg, src_reg, seg
+            //LDZX_DSZ64_ASZ64_SC8_DR(TMP0, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
+            ZEROEXT_DSZ64_DI(TMP1, 0xa790),
             NOP_SEQWORD
-
-            //NOP,
-            //NOP,
-            //NOP,
-            //SEQ_GOTO0(addr+0x14)
         },
         {   // 0x4
-            //TESTUSTATE_SYS_NOT(0x2),
-            //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP0, 0xba40),
-            //STADSTGBUF_DSZ64_ASZ16_SC1_RI(TMP1, 0xba80),
-            //SEQ_GOTO0(addr+0x14)
-
-            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x08),  // dst_reg, src_reg, seg
-            ZEROEXT_DSZ64_DI(TMP1, 0x4142),
             SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
-            //XOR_DSZ64_DRR(TMP0, TMP0, TMP1),
-//	    NOP,
-//	    NOP,
-//	    NOP,
+            ADD_DSZ32_DRI(TMP1, TMP1, 0x16d7),
+            SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
             NOP_SEQWORD
 
         },
-        {   // 0x8
-            //ZEROEXT_DSZ32_DI(TMP0, 0xdead),
-            //CONCAT_DSZ16_DRR(TMP0, TMP0, TMP0),
-            //CONCAT_DSZ32_DRR(TMP0, TMP0, TMP0),
-            //NOP_SEQWORD
-            
-            ADD_DSZ32_DRI(TMP1, TMP1, 0x4142),
-            SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
-	    UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
-	    //MOVE_DSZ64_DI(RAX, 0xabcd),
-        //    NOP,
-        //    NOP,
-        //    NOP,
+        {   // 0x8 
+            ADD_DSZ32_DRI(TMP1, TMP1, 0x97e6),
+            SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
+            ADD_DSZ32_DRI(TMP1, TMP1, 0xbd3d),
             NOP_SEQWORD
-	    //END_SEQWORD
         },
-//        {   // 0xc
-//            //XOR_DSZ64_DRR(TMP0, TMP0, RAX),
-//            //MOVE_DSZ64_DI(TMP1, hook_address),
-//            //UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
-//            //NOP_SEQWORD,
-//            NOP,
-//            NOP,
-//            NOP,
-//            NOP_SEQWORD
-//        },
+        {   // 0xc
+            //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
+            SUBR_DSZ32_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
+	        UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
+            NOP,
+            NOP_SEQWORD
+        },
 //        {   // 0x10
-//            //LDSTGBUF_DSZ64_ASZ16_SC1_DI(TMP0, 0xba40),
-//            //LDSTGBUF_DSZ64_ASZ16_SC1_DI(TMP1, 0xba80),
-//            //NOP,
-//            //NOP_SEQWORD,
-//            NOP,
 //            NOP,
 //            NOP,
 //            NOP_SEQWORD
 //        },
-        {   // 0x14  0x4
+        {   // 0x14  0x10
             uop0, uop1, uop2, seqw
         },
-        {   // 0x18
+        {   // 0x18  0x1c
             UJMP_I(hook_address+4), UJMP_I(hook_address+5), UJMP_I(hook_address+6), NOP_SEQWORD
-            //NOP,
-            //NOP,
-            //NOP,
-            //SEQ_GOTO0(0x08b4)
         }
     };
 
