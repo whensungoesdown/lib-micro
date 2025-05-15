@@ -27,8 +27,13 @@ void install_jump_target(void) {
 //    { NOP, NOP, NOP,
 //            END_SEQWORD }, //0x7d00
     //{MOVE_DSZ64_DI(RAX, 0x1234), NOP, NOP, END_SEQWORD} // SEQW UEND0
-    {NOP, NOP, XOR_DSZ64_DRR(RCX, RCX, RCX), NOP_SEQWORD},
-    {SUBR_DSZ64_DRR(TMP10, TMP10, TMP10), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
+
+    //{NOP, NOP, XOR_DSZ64_DRR(RCX, RCX, RCX), NOP_SEQWORD},
+    //{SUBR_DSZ64_DRR(TMP10, TMP10, TMP10), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
+    {XOR_DSZ64_DRR(RCX, RCX, RCX), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
+
+
+
 //        {UNK256, NOP, NOP, END_SEQWORD}, //0x7d04
     };
 //    if (verbose)
@@ -65,30 +70,35 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //MOVEFROMCREG_DSZ64_DI(TMP10, 0x0),
             //0x21e3b000200, //SIGEVENT(0x0000003b)
             NOP,
-            LDZX_DSZ64_ASZ32_SC1_DR(TMP0, RDI, 0x08),  // dst_reg, src_reg, seg
-            //LDZX_DSZ64_ASZ64_SC8_DR(TMP0, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
-            ZEROEXT_DSZ64_DI(TMP1, 0xa790),
+            //0x1c0000231027, //
+            //LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
+            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
+            //LDZX_DSZ64_ASZ64_SC8_DR(TMP1, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
+            ZEROEXT_DSZ64_DI(TMP0, 0xa790),
             NOP_SEQWORD
         },
         {   // 0x4
-            SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
-            ADD_DSZ32_DRI(TMP1, TMP1, 0x16d7),
-            SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
+            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
+            ADD_DSZ32_DRI(TMP0, TMP0, 0x16d7),
+            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
             NOP_SEQWORD
 
         },
         {   // 0x8 
-            ADD_DSZ32_DRI(TMP1, TMP1, 0x97e6),
-            SHL_DSZ32_DRI(TMP1, TMP1, 0x10),
-            ADD_DSZ32_DRI(TMP1, TMP1, 0xbd3d),
+            ADD_DSZ32_DRI(TMP0, TMP0, 0x97e6),
+            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
+            ADD_DSZ32_DRI(TMP0, TMP0, 0xbd3d),
             NOP_SEQWORD
         },
         {   // 0xc
-            //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
-            SUBR_DSZ32_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
-	        UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP0, JUMP_DESTINATION),
             NOP,
+            //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
+            //0x10050003ac31, 
+            //SUBR_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
+            SUB_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
+	        UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP10, JUMP_DESTINATION),
             NOP_SEQWORD
+            //0x018000e5, //NOP_SEQWORD, SUBR MSLOOP
         },
 //        {   // 0x10
 //            NOP,
@@ -258,7 +268,13 @@ int main(int argc, char* argv[]) {
 //    print_seqw(0x18b9100);
 //    printf("\n");
 //
+//    printf("0x018000e6\n");
+//    print_seqw(0x018000e6);
+//    printf("\n");
+
+//    printf("LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08) : 0x%x\n", LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08));
 //    return 0;
+
 
 
 //    do_fix_IN_patch();
