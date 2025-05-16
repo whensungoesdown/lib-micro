@@ -30,7 +30,9 @@ void install_jump_target(void) {
 
     //{NOP, NOP, XOR_DSZ64_DRR(RCX, RCX, RCX), NOP_SEQWORD},
     //{SUBR_DSZ64_DRR(TMP10, TMP10, TMP10), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
-    {XOR_DSZ64_DRR(RCX, RCX, RCX), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
+    //{XOR_DSZ64_DRR(RCX, RCX, RCX), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
+//    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, SFENCE, 0x0b0000f2} // SEQW UEND0
+    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
 
 
 
@@ -41,6 +43,7 @@ void install_jump_target(void) {
     patch_ucode(addr, ucode_patch, ARRAY_SZ(ucode_patch));
 //    if (verbose)
         printf("jump_target return value: 0x%lx\n", ucode_invoke(addr));
+        print_patch(addr, ucode_patch, ARRAY_SZ(ucode_patch));
 }
 
 
@@ -54,9 +57,9 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
     u64 uop1 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+1) & CRC_UOP_MASK;
     u64 uop2 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+2) & CRC_UOP_MASK;
     u64 seqw = ldat_array_read(0x6a0, 1, 0, 0, hook_address)   & CRC_SEQ_MASK;
-    printf("0x08b0 uop 0x%llx\n", (long long unsigned int)uop0);
-    printf("0x08b1 uop 0x%llx\n", (long long unsigned int)uop1);
-    printf("0x08b2 uop 0x%llx\n", (long long unsigned int)uop2);
+    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop0);
+    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop1);
+    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop2);
     printf("      seqw 0x%llx\n", (long long unsigned int)seqw);
 
     ucode_t ucode_patch[] = {
@@ -71,23 +74,30 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //0x21e3b000200, //SIGEVENT(0x0000003b)
             NOP,
             //0x1c0000231027, //
-            //LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
-            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
+//            LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
+            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08) | MOD1,  // dst_reg, src_reg, seg
             //LDZX_DSZ64_ASZ64_SC8_DR(TMP1, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
-            ZEROEXT_DSZ64_DI(TMP0, 0xa790),
+            ZEROEXT_DSZ32_DI(TMP0, 0xa790),
+//            ZEROEXT_DSZ64_DI(TMP0, 0xa790),
             NOP_SEQWORD
         },
         {   // 0x4
-            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
-            ADD_DSZ32_DRI(TMP0, TMP0, 0x16d7),
-            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
+//            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
+//            ADD_DSZ32_DRI(TMP0, TMP0, 0x16d7),
+//            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
+            SHL_DSZ64_DRI(TMP0, TMP0, 0x10),
+            ADD_DSZ64_DRI(TMP0, TMP0, 0x16d7),
+            SHL_DSZ64_DRI(TMP0, TMP0, 0x10),
             NOP_SEQWORD
 
         },
         {   // 0x8 
-            ADD_DSZ32_DRI(TMP0, TMP0, 0x97e6),
-            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
-            ADD_DSZ32_DRI(TMP0, TMP0, 0xbd3d),
+//            ADD_DSZ32_DRI(TMP0, TMP0, 0x97e6),
+//            SHL_DSZ32_DRI(TMP0, TMP0, 0x10),
+//            ADD_DSZ32_DRI(TMP0, TMP0, 0xbd3d),
+            ADD_DSZ64_DRI(TMP0, TMP0, 0x97e6),
+            SHL_DSZ64_DRI(TMP0, TMP0, 0x10),
+            ADD_DSZ64_DRI(TMP0, TMP0, 0xbd3d),
             NOP_SEQWORD
         },
         {   // 0xc
@@ -95,10 +105,11 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //SUBR_DSZ64_DRR(TMP0, TMP0, TMP1),   // dst, src0, src1
             //0x10050003ac31, 
             //SUBR_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
+//            SUB_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
             SUB_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
 	        UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP10, JUMP_DESTINATION),
-            NOP_SEQWORD
-            //0x018000e5, //NOP_SEQWORD, SUBR MSLOOP
+            //NOP_SEQWORD
+            0x018000e5, //NOP_SEQWORD, SUB MSLOOP
         },
 //        {   // 0x10
 //            NOP,
@@ -268,11 +279,13 @@ int main(int argc, char* argv[]) {
 //    print_seqw(0x18b9100);
 //    printf("\n");
 //
-//    printf("0x018000e6\n");
-//    print_seqw(0x018000e6);
+//    printf("0x018000e5\n");
+//    print_seqw(0x018000e5);
 //    printf("\n");
 
 //    printf("LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08) : 0x%x\n", LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08));
+//    printf("GENARITHFLAGS_IR(0x0000003f, TMP10) : 0x%x\n", GENARITHFLAGS_IR(0x0000003f, TMP10));
+//    printf("SFENCE : 0x%x\n", SFENCE);
 //    return 0;
 
 
