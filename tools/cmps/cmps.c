@@ -32,7 +32,8 @@ void install_jump_target(void) {
     //{SUBR_DSZ64_DRR(TMP10, TMP10, TMP10), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
     //{XOR_DSZ64_DRR(RCX, RCX, RCX), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
 //    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, SFENCE, 0x0b0000f2} // SEQW UEND0
-    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
+//    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
+    {SUB_DSZ32_DRR(RCX, RCX, RCX), 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
 
 
 
@@ -74,8 +75,8 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //0x21e3b000200, //SIGEVENT(0x0000003b)
             NOP,
             //0x1c0000231027, //
-//            LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
-            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08) | MOD1,  // dst_reg, src_reg, seg
+            LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
+//            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08) | MOD1,  // dst_reg, src_reg, seg
             //LDZX_DSZ64_ASZ64_SC8_DR(TMP1, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
             ZEROEXT_DSZ32_DI(TMP0, 0xa790),
 //            ZEROEXT_DSZ64_DI(TMP0, 0xa790),
