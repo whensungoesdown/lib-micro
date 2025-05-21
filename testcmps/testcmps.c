@@ -22,15 +22,18 @@ void static inline assign_to_core(int core_id) {
 int test(void)
 {
 
-        long long unsigned int data = 0xa79016d797e6bd3d;
+        //long long unsigned int data = 0xa79016d797e6bd3d;
         //long long unsigned int data = 0x0000000097e6bd3d;
         //long long unsigned int data = 0x00000000a79016d7;
-        unsigned char a[] = "abcdefgh\0";
-        unsigned char* b = (unsigned char*)&data;
-        unsigned char c[] = "abcdefgh\0";
+        unsigned char hash[] = "\x3d\xbd\xe6\x97\xd7\x16\x90\xa7\x69\x20\x4b\xeb\x12\x28\x36\x78";
+        unsigned char    a[] = "abcdefghaaaabbbb\0";
+        //unsigned char* b = (unsigned char*)&data;
+        unsigned char    c[] = "abcdefghaaaabbbb\0";
 
         int ret = 0;
         long long int retrax = 0xff;
+
+        printf("0x%llx\n", *(long long int *)hash);
 
 //        ret = memcmp(a, b, 8);
 
@@ -38,13 +41,15 @@ int test(void)
              //"movq $1, %%rcx\n\t"
              "xor %%rcx, %%rcx\n\t"
              "inc %%rcx\n\t"
+             //"inc %%rcx\n\t"
              "movq %1, %%rsi\n\t"
              "movq %2, %%rdi\n\t"
              "repe cmpsq\n\t"
+             //"cmpsq\n\t"
              "movq %%rax, %0\n\t"
              "jne notequal\n\t"
              : "=r" (retrax)
-             : "r" (a), "r"(b)
+             : "r" (a), "r"(hash)
              :
              );
 

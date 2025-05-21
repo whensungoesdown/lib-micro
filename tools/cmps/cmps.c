@@ -107,7 +107,7 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //0x10050003ac31, 
             //SUBR_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
 //            SUB_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
-            SUB_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
+            SUB_DSZ64_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
 	        UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP10, JUMP_DESTINATION),
             //NOP_SEQWORD
             0x018000e5, //NOP_SEQWORD, SUB MSLOOP
