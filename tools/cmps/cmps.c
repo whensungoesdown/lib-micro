@@ -15,7 +15,7 @@
 
 //#define JUMP_DESTINATION 0x7c10
 //#define JUMP_DESTINATION 0x7c00
-#define JUMP_DESTINATION 0x7d20
+#define JUMP_DESTINATION 0x7dbc
 
 void install_jump_target(void) {
     unsigned long addr = JUMP_DESTINATION;
@@ -320,7 +320,7 @@ int main(int argc, char* argv[]) {
 	    printf("core %d\n", i);
 	    assign_to_core(i);
 	    do_fix_IN_patch();
-	    hook_cmps(0x7d30, CMPS_XLAT, 30);
+	    hook_cmps(0x7dc8, CMPS_XLAT, 30);
 	    sleep(1);
     }
 
