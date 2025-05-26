@@ -77,6 +77,6 @@ u64 ldat_array_read(u64 pdat_reg, u64 array_sel, u64 bank_sel, u64 dword_idx, u6
 
 void do_fix_IN_patch() {
     // Patch U58ba to U017a
-    //hook_match_and_patch(0x1f, 0x58ba, 0x017a);
-    hook_match_and_patch(0x1f, 0x4912, 0x0172);
+    hook_match_and_patch(0x1f, 0x58ba, 0x017a);
+    //hook_match_and_patch(0x1f, 0x4912, 0x0172);
 }

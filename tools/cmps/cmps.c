@@ -14,7 +14,8 @@
 //u8 verbose = 0;
 
 //#define JUMP_DESTINATION 0x7c10
-#define JUMP_DESTINATION 0x7c00
+//#define JUMP_DESTINATION 0x7c00
+#define JUMP_DESTINATION 0x7d20
 
 void install_jump_target(void) {
     unsigned long addr = JUMP_DESTINATION;
@@ -33,7 +34,10 @@ void install_jump_target(void) {
     //{XOR_DSZ64_DRR(RCX, RCX, RCX), GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, 0x0b0000f2} // SEQW UEND0
 //    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, SFENCE, 0x0b0000f2} // SEQW UEND0
 //    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
-    {SUB_DSZ32_DRR(RCX, RCX, RCX), 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
+    //{SUB_DSZ32_DRR(RCX, RCX, RCX), 0x237d3f000e88, 0x0fff00000000, 0x0b0000f2} // SEQW UEND0
+    {0x11890b8279c8, 0x11890b8279c8, 0x11890b826988, NOP_SEQWORD},
+    {0x11890b826988, NOP, NOP, NOP_SEQWORD}, 
+    {SUB_DSZ32_DRR(RCX, RCX, RCX) | MOD1, GENARITHFLAGS_IR(0x0000003f, TMP10), SFENCE, END_SEQWORD} // SEQW UEND0
 
 
 
@@ -75,7 +79,7 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //0x21e3b000200, //SIGEVENT(0x0000003b)
             NOP,
             //0x1c0000231027, //
-            LDZX_DSZ64_ASZ32_SC1_DR(TMP1, RDI, 0x08),  // dst_reg, src_reg, seg
+            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08) | MOD1,  // dst_reg, src_reg, seg
 //            LDZX_DSZ32_ASZ32_SC1_DR(TMP1, RDI, 0x08) | MOD1,  // dst_reg, src_reg, seg
             //LDZX_DSZ64_ASZ64_SC8_DR(TMP1, RDI, 0x08),  // _LDZX_DSZ64_ASZ64_SC8 not defined in include/opcode.h, for now, only use 32-bit 
             ZEROEXT_DSZ32_DI(TMP0, 0xa790),
@@ -107,10 +111,10 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx) {
             //0x10050003ac31, 
             //SUBR_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
 //            SUB_DSZ32_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
-            SUB_DSZ64_DRR(TMP10, TMP1, TMP0),   // dst, src0, src1
+            SUB_DSZ32_DRR(TMP10, TMP1, TMP0) | MOD1,   // dst, src0, src1
 	        UJMPCC_DIRECT_NOTTAKEN_CONDZ_RI(TMP10, JUMP_DESTINATION),
-            //NOP_SEQWORD
-            0x018000e5, //NOP_SEQWORD, SUB MSLOOP
+            NOP_SEQWORD
+            //0x018000e5, //NOP_SEQWORD, SUB MSLOOP
         },
 //        {   // 0x10
 //            NOP,
@@ -245,7 +249,7 @@ int main(int argc, char* argv[]) {
 
     int i = 0;
 
-    assign_to_core(0);
+//    assign_to_core(0);
 
 //    // test
 //    printf("SEQ_UEND0(0) 0x%x\n", SEQ_UEND0(0));
@@ -301,16 +305,23 @@ int main(int argc, char* argv[]) {
 //    usleep(20000);
 
 //#define CMPS_XLAT   0x08b0
-#define CMPS_XLAT   0x3cc8
+//#define CMPS_XLAT   0x3cc8
+#define CMPS_XLAT   0x3de8
 
-    hook_cmps(0x7c10, CMPS_XLAT, 1);
+    //hook_cmps(0x7c10, CMPS_XLAT, 1);
+   //hook_cmps(0x7d30, CMPS_XLAT, 18);
 
     //    printf("press any key to run test().\n");
     //    getchar();
 
-    //for (i = 0; i < 100; i++)
+    for (i = 0; i < 4; i++)
     {
-//        test();
+	    //        test();
+	    printf("core %d\n", i);
+	    assign_to_core(i);
+	    do_fix_IN_patch();
+	    hook_cmps(0x7d30, CMPS_XLAT, 30);
+	    sleep(1);
     }
 
 //    usleep(20000);
