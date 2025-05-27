@@ -28,7 +28,7 @@ void install_jump_target(void) {
 
     printf("patching addr: %08lx - ram: %08lx\n", addr, ucode_addr_to_patch_addr(addr));
     patch_ucode(addr, ucode_patch, ARRAY_SZ(ucode_patch));
-    printf("jump_target return value: 0x%lx\n", ucode_invoke(addr));
+    //printf("jump_target return value: 0x%lx\n", ucode_invoke(addr));
     print_patch(addr, ucode_patch, ARRAY_SZ(ucode_patch));
 }
 
@@ -95,6 +95,8 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx)
     hook_match_and_patch(idx, hook_address, addr);
 }
 
+//#define CMPS_XLAT   0x3cc8
+#define CMPS_XLAT   0x3de8
 
 int main(int argc, char* argv[])
 {
