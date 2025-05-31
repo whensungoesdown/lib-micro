@@ -42,14 +42,14 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx)
 
     install_jump_target();
 
-    u64 uop0 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+0) & CRC_UOP_MASK;
-    u64 uop1 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+1) & CRC_UOP_MASK;
-    u64 uop2 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+2) & CRC_UOP_MASK;
-    u64 seqw = ldat_array_read(0x6a0, 1, 0, 0, hook_address)   & CRC_SEQ_MASK;
-    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop0);
-    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop1);
-    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop2);
-    printf("      seqw 0x%llx\n", (long long unsigned int)seqw);
+//    u64 uop0 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+0) & CRC_UOP_MASK;
+//    u64 uop1 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+1) & CRC_UOP_MASK;
+//    u64 uop2 = ldat_array_read(0x6a0, 0, 0, 0, hook_address+2) & CRC_UOP_MASK;
+//    u64 seqw = ldat_array_read(0x6a0, 1, 0, 0, hook_address)   & CRC_SEQ_MASK;
+//    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop0);
+//    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop1);
+//    printf("0x3cc8 uop 0x%llx\n", (long long unsigned int)uop2);
+//    printf("      seqw 0x%llx\n", (long long unsigned int)seqw);
 
     ucode_t ucode_patch[] = {
         {   // 0x0
@@ -81,7 +81,11 @@ void hook_cmps(u64 addr, u64 hook_address, u64 idx)
                 // BUG FIX: no MSLOOP, msloop cause gdb traped at repe cmps with resume flag (RF) set
         },
         {   // 0x10
-            uop0, uop1, uop2, seqw
+            //uop0, uop1, uop2, seqw
+            //U3cc8: 1c0000231027                 tmp1:= LDZX_DSZN_ASZ32_SC1(rdi, mode=0x08)
+            //U3cc9: 1c0000630026                 tmp0:= LDZX_DSZN_ASZ32_SC1(rsi, mode=0x18)
+            //U3cca: 108501034d08                 tmp4:= SUB_DSZN(0x00000001, tmp4)
+	    0x1c0000231027, 0x1c0000630026, 0x108501034d08, 0x18000c0
         },
         {   // 0x1c
             UJMP_I(hook_address+4), UJMP_I(hook_address+5), UJMP_I(hook_address+6), NOP_SEQWORD
